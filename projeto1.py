@@ -1,5 +1,5 @@
 import sqlite3
-import datetime
+from datetime import datetime
 
 class Produto:
     def __init__(self, id, nome, categoria, quantidade, preco, localizacao):
@@ -15,6 +15,9 @@ class GerenciadorEstoque:
         self.conn = sqlite3.connect(db_name)
         self.cursor = self.conn.cursor()
         self.criar_tabela()
+        self.criar_tabela_historico()
+
+
 
     def criar_tabela(self):
         self.cursor.execute('''
@@ -25,6 +28,19 @@ class GerenciadorEstoque:
                 quantidade INTEGER,
                 preco REAL NOT NULL,
                 localizacao TEXT NOT NULL
+            );
+        ''')
+
+    def criar_tabela_historico(self):
+        self.cursor.execute('''
+            CREATE TABLE IF NOT EXISTS HistoricoEstoque (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                id_produto INTEGER,
+                nome_produto TEXT,
+                tipo_operacao TEXT,  -- 'entrada' ou 'saida'
+                quantidade INTEGER,
+                data_hora TEXT,
+                FOREIGN KEY (id_produto) REFERENCES Estoque(id)
             );
         ''')
         self.conn.commit()
@@ -50,24 +66,30 @@ class GerenciadorEstoque:
         self.cursor.execute("DELETE FROM Estoque WHERE id = ?", (id_produto,))
         self.conn.commit()
 
-    def chegou_no_estoque(self, id_produto, quantidade_chegou):
+    def chegou_no_estoque(self, id_produto,nome_produto, quantidade_chegou):
         self.cursor.execute("SELECT quantidade FROM Estoque WHERE id = ?", (id_produto,))
         quantidade_atual = self.cursor.fetchone()
 
         if quantidade_atual:
             nova_quantidade = quantidade_atual[0] + quantidade_chegou
             self.atualizar_quantidade(id_produto, nova_quantidade)
+            data_hora = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            self.cursor.execute('INSERT INTO HistoricoEstoque (id_produto,nome_produto, tipo_operacao, quantidade, data_hora)VALUES (?,?,"entrada",?,?)',(id_produto,nome_produto,quantidade_chegou,data_hora))
+            self.conn.commit()
             print(f"Nova quantidade do produto ID {id_produto}: {nova_quantidade}")
         else:
             print("Produto não encontrado no estoque.")
     
-    def saiu_do_estoque(self, id_produto, quantidade_saiu):
+    def saiu_do_estoque(self, id_produto,nome_produto, quantidade_saiu):
         self.cursor.execute("SELECT quantidade FROM Estoque WHERE id = ?", (id_produto,))
         quantidade_atual = self.cursor.fetchone()
 
         if quantidade_atual:
             nova_quantidade = quantidade_atual[0] - quantidade_saiu
             self.atualizar_quantidade(id_produto, nova_quantidade)
+            data_hora = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            self.cursor.execute('INSERT INTO HistoricoEstoque (id_produto,nome_produto,tipo_operacao, quantidade, data_hora)VALUES (?,?,"saida",?,?)',(id_produto,nome_produto,quantidade_saiu,data_hora))
+            self.conn.commit()
             print(f"Nova quantidade do produto ID {id_produto}: {nova_quantidade}")
         else:
             print("Produto não encontrado no estoque.")
@@ -93,6 +115,17 @@ class GerenciadorEstoque:
         else:
             print(f"Produto {nome} não encontrado no estoque.")
 
+    
+    
+    def consultar_historico(self):
+        self.cursor.execute('SELECT * FROM HistoricoEstoque')
+        historico = self.cursor.fetchall()
+
+        for registro in historico:
+            print(registro)
+
+
+
 
 
     def fechar(self):
@@ -111,6 +144,7 @@ def menu_estoquista():
         6- Para adicionar quantidade ao estoque
         7- Para remover quantidade do estoque
         8- Para locazaliar o produto
+        9- Para ver o historico de movimentação
         0- Sair
     """)
     escolha = int(input("Digite o número desejado: "))
@@ -140,15 +174,19 @@ def menu_estoquista():
             gerenciador.gerar_relatorio()
         elif escolha == 6:
             id = int(input("Id do produto: "))
+            nome = input("Nome do produto: ")
             quantidade = int(input("Quantidade que chegou: "))
-            gerenciador.chegou_no_estoque(id, quantidade)
+            gerenciador.chegou_no_estoque(id,nome, quantidade)
         elif escolha == 7:
             id = int(input("Id do produto: "))
+            nome = input("Nome do produto: ")
             quantidade = int(input("Quantidade saiu do estoque: "))
-            gerenciador.saiu_do_estoque(id, quantidade)
+            gerenciador.saiu_do_estoque(id,nome, quantidade)
         elif escolha == 8:
             nome = input("Digite o nome do produto: ")
             gerenciador.localizar(nome)
+        elif escolha == 9:
+            gerenciador.consultar_historico()
         escolha = int(input("Digite o número desejado ou 0 para sair: "))
 
 
