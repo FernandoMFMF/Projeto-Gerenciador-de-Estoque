@@ -1,4 +1,5 @@
 import sqlite3
+import datetime
 
 class Produto:
     def __init__(self, id, nome, categoria, quantidade, preco, localizacao):
