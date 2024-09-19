@@ -125,7 +125,9 @@ class GerenciadorEstoque:
             print(registro)
 
 
-
+    def remover_produto_historico_estoque(self):
+        self.cursor.execute("DELETE FROM HistoricoEstoque")
+        self.conn.commit()
 
 
     def fechar(self):
@@ -145,6 +147,7 @@ def menu_estoquista():
         7- Para remover quantidade do estoque
         8- Para locazaliar o produto
         9- Para ver o historico de movimentação
+        10- Para remover todos os itens do HistoricoEstoque
         0- Sair
     """)
     escolha = int(input("Digite o número desejado: "))
@@ -187,6 +190,8 @@ def menu_estoquista():
             gerenciador.localizar(nome)
         elif escolha == 9:
             gerenciador.consultar_historico()
+        elif escolha == 10:
+            gerenciador.remover_produto_historico_estoque()
         escolha = int(input("Digite o número desejado ou 0 para sair: "))
 
 
