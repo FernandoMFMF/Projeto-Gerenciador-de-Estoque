@@ -5,3 +5,4 @@ Referências:
     https://docs.python.org/3/library/sqlite3.html -- documentação do SQLite3,
     https://www.youtube.com/watch?v=EmIGLGUO7cY -- Tabela verdade,
     https://www.youtube.com/watch?v=ab6eDdwS3rA&t=1s -- Casos de uso,
+    https://docs.python.org/3/library/itertools.html
