@@ -128,6 +128,8 @@ class GerenciadorEstoque:
     def remover_produto_historico_estoque(self):
         self.cursor.execute("DELETE FROM HistoricoEstoque")
         self.conn.commit()
+        self.cursor.execute("DELETE FROM sqlite_sequence WHERE name='HistoricoEstoque'")
+        self.conn.commit()
 
 
     def fechar(self):
