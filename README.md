@@ -1,4 +1,4 @@
-Este codigo está em desenvolvimento.
+Este codigo está em desenvolvimento, terá atualizações futuras.
 Referências:
     Aulas CW1, CW2, CW3, CW4,
     https://docs.python.org/3/library/datetime.html -- Documentação do datetime,
