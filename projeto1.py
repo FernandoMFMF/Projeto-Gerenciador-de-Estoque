@@ -1,5 +1,6 @@
 import sqlite3
 from datetime import datetime
+import pandas as pd
 
 class Produto:
     def __init__(self, id, nome, categoria, quantidade, preco, localizacao):
@@ -60,7 +61,9 @@ class GerenciadorEstoque:
 
     def consultar_estoque(self):
         self.cursor.execute("SELECT * FROM Estoque")
-        return self.cursor.fetchall()
+        produtos = self.cursor.fetchall()
+        df = pd.DataFrame(produtos, columns=["id","NOME","CATEGORIA","QUANTIDADE","PRECO", "LOCALIZAÇÃO"])
+        print(df)
 
     def remover_produto(self, id_produto):
         self.cursor.execute("DELETE FROM Estoque WHERE id = ?", (id_produto,))
@@ -140,25 +143,24 @@ gerenciador = GerenciadorEstoque()
 
 def menu_estoquista():
     print("""
-        1- Para mostrar o estoque
-        2- Para adicionar um produto ao estoque
-        3- Para atualizar um produto
-        4- Para remover um produto
-        5- Para ver o relatório
-        6- Para adicionar quantidade ao estoque
-        7- Para remover quantidade do estoque
-        8- Para locazaliar o produto
-        9- Para ver o historico de movimentação
-        10- Para remover todos os itens do HistoricoEstoque
-        0- Sair
+        1- Para mostrar o estoque.
+        2- Para adicionar um produto ao estoque.
+        3- Para atualizar um produto.
+        4- Para remover um produto.
+        5- Para ver o relatório.
+        6- Para adicionar quantidade ao estoque.
+        7- Para remover quantidade do estoque.
+        8- Para locazaliar o produto.
+        9- Para ver o historico de movimentação.
+        10- Para remover todos os itens do Historico do Estoque.
+        0- Sair.
     """)
     escolha = int(input("Digite o número desejado: "))
 
     while escolha != 0:
         if escolha == 1:
             estoque = gerenciador.consultar_estoque()
-            for produto in estoque:
-                print(produto)
+            print(estoque)
         elif escolha == 2:
             id = int(input("Id: "))
             nome = input("Nome: ")
