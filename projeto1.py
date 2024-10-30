@@ -138,7 +138,6 @@ class GerenciadorEstoque:
     def fechar(self):
         self.conn.close()
 
-# Exemplo de uso:
 gerenciador = GerenciadorEstoque()
 
 def menu_estoquista():
